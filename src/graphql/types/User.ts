@@ -1,5 +1,5 @@
 import { extendType, objectType } from "nexus";
-import {TodoList} from "./TodoList";
+import { TodoList } from "./TodoList";
 
 export const User = objectType({
   name: "User",
@@ -42,17 +42,14 @@ export const Query = extendType({
   },
 });
 
-
 export const Query2 = extendType({
   type: "Query",
   definition(t) {
     t.list.field("allUsers", {
       type: User,
       resolve(root, args, context) {
-
         return context.prisma.user.findMany();
       },
     });
   },
 });
-

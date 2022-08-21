@@ -1,10 +1,8 @@
-import React, {FC} from "react";
+import React, { FC } from "react";
 
 import styled from "styled-components";
 
-
 const AppTitle = styled.h1`
-
   margin: 10px;
   margin-left: 20px;
   font-size: 2em;
@@ -12,7 +10,6 @@ const AppTitle = styled.h1`
 `;
 
 const AppSubTitle = styled.h2`
-
   margin: 10px;
   margin-left: 25px;
   margin-top: -10px;
@@ -21,7 +18,6 @@ const AppSubTitle = styled.h2`
   font-family: "Roboto";
 `;
 const AppTitleDivider = styled.div`
-
   width: 100px;
   height: 1px;
 
@@ -32,14 +28,13 @@ const AppTitleDivider = styled.div`
 `;
 
 const AppLogo: FC = () => {
-
-
-    return <div>
-                <AppTitle>ToPa</AppTitle>
-                <AppTitleDivider/>
-                <AppSubTitle>Todolist Panter</AppSubTitle>
+  return (
+    <div>
+      <AppTitle>ToPa</AppTitle>
+      <AppTitleDivider />
+      <AppSubTitle>Todolist Panter</AppSubTitle>
     </div>
-        ;
+  );
 };
 
 export default AppLogo;

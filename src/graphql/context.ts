@@ -8,8 +8,11 @@ export type Context = {
   session: Session | null;
 };
 
-export const context: ({ req }: { req: NextApiRequest }) => Promise<Context> =
-  async ({ req }) => ({
-    prisma: prismaClient,
-    session: await getSession({ req }),
-  });
+export const context: ({
+  req,
+}: {
+  req: NextApiRequest;
+}) => Promise<Context> = async ({ req }) => ({
+  prisma: prismaClient,
+  session: await getSession({ req }),
+});

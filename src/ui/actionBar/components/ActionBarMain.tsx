@@ -1,7 +1,7 @@
-import React, {FC} from "react";
+import React, { FC } from "react";
 import MyUserAvatar from "../../user/components/MyUserAvatar";
 
-import {useMe} from "../../user/hooks/useMe";
+import { useMe } from "../../user/hooks/useMe";
 import styled from "styled-components";
 import AppLogo from "./AppLogo";
 
@@ -36,20 +36,20 @@ const LeftDiv = styled.div`
 `;
 
 const ActionBarMain: FC = () => {
-    const me = useMe().data?.me;
+  const me = useMe().data?.me;
 
-
-    return <MainDiv>
-        <Header>
-            <LeftDiv>
-                <AppLogo />
-            </LeftDiv>
-            <RightDiv>
-                <MyUserAvatar/>
-            </RightDiv>
-        </Header>
+  return (
+    <MainDiv>
+      <Header>
+        <LeftDiv>
+          <AppLogo />
+        </LeftDiv>
+        <RightDiv>
+          <MyUserAvatar />
+        </RightDiv>
+      </Header>
     </MainDiv>
-        ;
+  );
 };
 
 export default ActionBarMain;

@@ -1,8 +1,9 @@
-import React, {FC} from "react";
+import React, { FC } from "react";
 import MyUserAvatar from "../../user/components/MyUserAvatar";
 
-import {useMe} from "../../user/hooks/useMe";
+import { useMe } from "../../user/hooks/useMe";
 import styled from "styled-components";
+import { router } from "next/client";
 
 const MainDiv = styled.div`
   width: 100%;
@@ -20,7 +21,6 @@ const Header = styled.div`
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 5px;
 `;
 
-
 const ArrowBack = styled.p`
   display: block;
   margin: auto;
@@ -28,7 +28,6 @@ const ArrowBack = styled.p`
   justify-content: flex-start;
   font-size: 2em;
   cursor: pointer;
-
 `;
 const RightDiv = styled.div`
   width: 80%;
@@ -45,7 +44,6 @@ const LeftDiv = styled.div`
 `;
 
 const ActivityTitleH1 = styled.h1`
-
   margin: auto;
   margin-right: 20px;
   font-size: 1em;
@@ -53,30 +51,28 @@ const ActivityTitleH1 = styled.h1`
   font-family: "Roboto";
 `;
 
-
-const ActivityTitle = "Manage your List"
-
+const ActivityTitle = "Manage your List";
 
 const ActionBarWithReturn: FC = () => {
-    const me = useMe().data?.me;
+  const me = useMe().data?.me;
 
-    const goToMain = () => {
-        window.location.assign('/');
-    }
+  const goToMain = () => {
+    router.push("/");
+  };
 
+  return (
+    <MainDiv>
+      <Header>
+        <LeftDiv>
+          <ArrowBack onClick={goToMain}>{"←"}</ArrowBack>
+        </LeftDiv>
 
-    return <MainDiv>
-        <Header>
-            <LeftDiv>
-                <ArrowBack onClick={goToMain}>{"←"}</ArrowBack>
-            </LeftDiv>
-
-            <RightDiv>
-                <ActivityTitleH1>{ActivityTitle}</ActivityTitleH1>
-            </RightDiv>
-        </Header>
+        <RightDiv>
+          <ActivityTitleH1>{ActivityTitle}</ActivityTitleH1>
+        </RightDiv>
+      </Header>
     </MainDiv>
-        ;
+  );
 };
 
 export default ActionBarWithReturn;

@@ -1,19 +1,14 @@
-import React, {FC, useState} from "react";
+import React, { FC, useState } from "react";
 
 import styled from "styled-components";
 import TodoListItem from "./todoListItem";
 import TodoListMenu from "../../floatingActionButton/components/TodoListMenu";
-import {gql, useQuery} from "@apollo/client";
-import Link from "next/link";
-import {v4 as uuidv4} from "uuid";
-import {useAllTodoItemsFromList} from "../hooks/useTodoList";
-
+import { gql, useQuery } from "@apollo/client";
+import { v4 as uuidv4 } from "uuid";
+import { useAllTodoItemsFromList } from "../hooks/useTodoList";
+import { useRouter } from "next/router";
 
 const AddElement = styled.div`
-
-
-
-
   border: dotted grey 1px;
   border-radius: 20px;
   display: flex;
@@ -23,15 +18,9 @@ const AddElement = styled.div`
   width: 50%;
   text-align: center;
   background: rgba(255, 255, 255, 0.4);
-
-
 `;
 
 const TextInputItem = styled.input`
-
-
-
-
   border: solid grey 1px;
   border-radius: 20px;
   margin: 10px;
@@ -39,15 +28,9 @@ const TextInputItem = styled.input`
   padding: 10px;
   min-width: 80%;
   background: rgba(255, 255, 255, 0.4);
-
 `;
 
-
 const TodoListTitle = styled.input`
-
-
-
-
   border: solid grey 1px;
   border-radius: 20px;
   margin: 10px;
@@ -55,13 +38,8 @@ const TodoListTitle = styled.input`
   min-width: 78%;
   font-size: 1.2em;
   background: rgba(255, 255, 255, 0.4);
-
-
 `;
 const DeleteItem = styled.input`
-
-
-
   background: rgba(255, 255, 255, 0.4);
 
   border: solid grey 1px;
@@ -74,158 +52,152 @@ const DeleteItem = styled.input`
   width: auto;
   display: flex;
   background-color: white;
-
 `;
 
 const ToDoItem = styled.div`
-
-
-
-
   display: flex;
-
 `;
 
+const TodoListEditor: FC = ({ setColour }) => {
+  // https://ibaslogic.com/simple-guide-to-react-form/
 
+  const colours = [
+    "#ffcdd2",
+    "#d1c4e9",
+    "#b3e5fc",
+    "#c8e6c9",
+    "#fff9c4",
+    "#ffccbc",
+  ];
 
+  const router = useRouter();
+  const id = router.query.id;
+  const title = router.query.title;
+  let listArgs = { todoListId: id };
 
-const TodoListEditor: FC = ({setColour}) => {
+  const initialColour =
+    id !== null
+      ? router.query.colour
+      : colours[Math.floor(Math.random() * colours.length)];
+  const [backgroundColour, setBackgroundColour] = useState(initialColour);
 
+  let initialState = { title: "", id: "" };
 
-    // https://ibaslogic.com/simple-guide-to-react-form/
+  if (id !== null || id !== "") {
+    initialState = { title: title == null ? "" : title, id: id };
+  }
 
+  setColour(backgroundColour);
+  const setColourIntermediator = (colour) => {
+    setColour(colour);
+    setBackgroundColour(colour);
+  };
 
-    const colours = ["#ffcdd2", "#d1c4e9", "#b3e5fc", "#c8e6c9", "#fff9c4", "#ffccbc"];
+  const [state, setState] = useState(initialState);
+  const [todoListItems, setTodoListItems] = useState([]);
 
-    const queryParams = new URLSearchParams(window.location.search)
+  const { data, error, loading } = useAllTodoItemsFromList({
+    variables: listArgs,
+    onCompleted: (data) => {
+      const temp = new Array(data.allTodoItemsFromList.length);
+      data.allTodoItemsFromList.map((e, i) => {
+        temp[i] = { title: e.title, isDone: e.isDone, position: uuidv4() };
+      });
 
-    const id = queryParams.get("id")
-    const title = queryParams.get("title")
-    let listArgs = {todoListId: id}
+      setTodoListItems(temp);
+    },
+  });
 
-    const initialColour  = id !== null?queryParams.get("colour"):colours[Math.floor(Math.random()*colours.length)];
-    const [backgroundColour, setBackgroundColour] = useState(initialColour);
+  if (loading) {
+    return <p>loading</p>;
+  }
+  if (error && id !== null) {
+    return <p>Oh no, something went wrong! {error.message}</p>;
+  }
 
-    let initialState = {title: "", id: ""}
+  const handleChange = (e) => {
+    const value =
+      e.target.type === "checkbox" ? e.target.checked : e.target.value;
+    setState({ ...state, [e.target.name]: value });
+  };
 
-    if (id !== null || id !== "") {
-        initialState = {title: title == null ? "" : title, id: id}
+  const handleItemChange = (e) => {
+    const temp = todoListItems;
 
+    if (e.target.type === "checkbox") {
+      temp[e.target.name].isDone = e.target.checked;
+    } else {
+      temp[e.target.name].title = e.target.value;
     }
+    setTodoListItems([...temp]);
+  };
 
-    setColour(backgroundColour)
-    const setColourIntermediator = colour => {
-        setColour(colour)
-        setBackgroundColour(colour)
-    }
+  const deleteItem = (e) => {
+    let object = e.target;
 
-    const [state, setState] = useState(initialState)
-    const [todoListItems, setTodoListItems] = useState([])
+    const temp = todoListItems;
 
-    const {data, error, loading} = useAllTodoItemsFromList(
-        {
-            variables: listArgs,
-            onCompleted: (data) => {
-                const temp = new Array(data.allTodoItemsFromList.length);
-                data.allTodoItemsFromList.map((e, i) => {
-                    temp[i] = {title: e.title, isDone: e.isDone, position: uuidv4()};
+    temp.splice(e.target.name, 1);
+    setTodoListItems([...temp]);
+  };
 
+  //https://stackoverflow.com/questions/40803828/how-can-i-map-through-an-object-in-reactjs
 
+  const addNewTodoItem = () => {
+    setTodoListItems([
+      ...todoListItems,
+      { title: "", isDone: 0, position: uuidv4() },
+    ]);
+  };
 
-                });
+  return (
+    <div>
+      <p>Title:</p>
+      <label>
+        <TodoListTitle
+          type="text"
+          name="title"
+          value={state["title"]}
+          onChange={handleChange}
+        />
+      </label>
 
-                setTodoListItems(temp)
+      <div>
+        {todoListItems.map((e, i) => (
+          <ToDoItem key={e.position}>
+            <input
+              type="checkbox"
+              name={i}
+              checked={e.isDone ? 1 : 0}
+              onChange={handleItemChange}
+            />
 
+            <TextInputItem
+              type="text"
+              name={i}
+              value={e.title}
+              onChange={handleItemChange}
+            />
+            <DeleteItem
+              type="button"
+              name={i}
+              onClick={deleteItem}
+              value={"x"}
+            />
+          </ToDoItem>
+        ))}
+      </div>
 
-            }
-        });
+      <AddElement onClick={addNewTodoItem}>Add Todo Item</AddElement>
 
-
-    if (loading) {
-        return <p>loading</p>
-    }
-    if (error && id !== null) {
-        return <p>Oh no, something went wrong! {error.message}</p>
-    }
-
-
-
-    const handleChange = e => {
-        const value = e.target.type === "checkbox" ? e.target.checked : e.target.value
-        setState({...state, [e.target.name]: value,})
-    }
-
-    const handleItemChange = e => {
-        const temp = todoListItems;
-
-        if (e.target.type === "checkbox") {
-            temp[e.target.name].isDone = e.target.checked;
-        } else {
-            temp[e.target.name].title = e.target.value;
-
-        }
-        setTodoListItems([...temp])
-    }
-
-
-    const deleteItem = e => {
-
-        let object = e.target;
-
-        const temp = todoListItems;
-
-        temp.splice(e.target.name, 1);
-        setTodoListItems([...temp])
-
-
-    }
-
-    //https://stackoverflow.com/questions/40803828/how-can-i-map-through-an-object-in-reactjs
-
-
-    const addNewTodoItem = () => {
-
-
-        setTodoListItems([...todoListItems, {title: "", isDone: 0, position: uuidv4()}])
-
-    }
-
-
-    return <div >
-        <p >Title:</p>
-        <label>
-            <TodoListTitle type="text"
-                           name="title"
-                           value={state["title"]}
-                           onChange={handleChange}/>
-        </label>
-
-        <div>
-
-            {
-                todoListItems.map((e, i) =>
-                    <ToDoItem key={e.position}>
-                        <input type="checkbox"
-                               name={i}
-                               checked={e.isDone ? 1 : 0}
-                               onChange={handleItemChange}/>
-
-                        <TextInputItem
-                            type="text"
-                            name={i}
-                            value={e.title}
-                            onChange={handleItemChange}/>
-                        <DeleteItem type="button" name={i} onClick={deleteItem} value={"x"}/>
-                    </ToDoItem>
-                )}
-        </div>
-
-        <AddElement onClick={addNewTodoItem}>Add Todo Item</AddElement>
-
-
-        <TodoListMenu state={state} todoListItems={todoListItems} setColour={setColourIntermediator} initialColour={backgroundColour}/>
+      <TodoListMenu
+        state={state}
+        todoListItems={todoListItems}
+        setColour={setColourIntermediator}
+        initialColour={backgroundColour}
+      />
     </div>
-        ;
+  );
 };
 
 export default TodoListEditor;

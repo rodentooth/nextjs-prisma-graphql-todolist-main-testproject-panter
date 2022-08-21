@@ -1,11 +1,9 @@
-import React, {FC} from "react";
+import React, { FC } from "react";
 
-import Link from 'next/link';
+import Link from "next/link";
 import styled from "styled-components";
 
 const FABstyle = styled.div`
-
-
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 5px;
   z-index: 999;
 
@@ -23,20 +21,14 @@ const FABstyle = styled.div`
   background-color: aquamarine;
   font-size: 3em;
   cursor: pointer;
-
 `;
 
 const FAB: FC = () => {
+  const goToCreateNewTodoList = () => {
+    window.location.assign("/viewTodoList/");
+  };
 
-
-    const goToCreateNewTodoList = () => {
-        window.location.assign('/viewTodoList/');
-    }
-
-    return <FABstyle onClick={goToCreateNewTodoList}>
-        +
-    </FABstyle>
-        ;
+  return <FABstyle onClick={goToCreateNewTodoList}>+</FABstyle>;
 };
 
 export default FAB;

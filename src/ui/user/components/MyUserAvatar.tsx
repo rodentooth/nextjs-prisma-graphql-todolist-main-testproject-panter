@@ -1,7 +1,7 @@
-import React, {FC, useState} from "react";
-import {useMe} from "../hooks/useMe";
+import React, { FC, useState } from "react";
+import { useMe } from "../hooks/useMe";
 import styled from "styled-components";
-import {signOut} from "next-auth/react";
+import { signOut } from "next-auth/react";
 
 const Image = styled.img`
   border-radius: 50%;
@@ -10,7 +10,6 @@ const Image = styled.img`
   margin: 10px;
 `;
 const ProfileMenu = styled.div`
-
   position: fixed;
 
   top: 0;
@@ -40,7 +39,6 @@ const LogOutButtonDiv = styled.div`
   justify-content: center;
 `;
 const SignOutButton = styled.button`
-
   border: none;
   background-color: darkred;
   padding: 15px 32px;
@@ -53,54 +51,55 @@ const SignOutButton = styled.button`
   display: flex;
   cursor: pointer;
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 5px;
-
 `;
 
 const ProfileMenuHeadingText = styled.p`
-
   font-weight: bold;
   margin: auto;
   margin-bottom: 10px;
 `;
 
-
 const MyUserAvatar: FC = () => {
-    const {data} = useMe();
-    const [profileMenuVisibility, setProfileMenuVisibility] = useState(false);
+  const { data } = useMe();
+  const [profileMenuVisibility, setProfileMenuVisibility] = useState(false);
 
+  if (!data?.me?.image) return null;
 
-    if (!data?.me?.image) return null;
+  const handleProfileImgClick = () => {
+    setProfileMenuVisibility(!profileMenuVisibility);
+  };
 
+  const ImageWithProps = ({ ...props }) => (
+    <Image
+      {...props}
+      alt={data.me.name ?? ""}
+      src={data.me?.image}
+      onClick={handleProfileImgClick}
+    />
+  );
 
-    const handleProfileImgClick = () => {
+  return (
+    <div>
+      <ImageWithProps referrerpolicy="no-referrer" />
 
-        setProfileMenuVisibility(!profileMenuVisibility)
-
-    }
-
-    const ImageWithProps = ({...props}) => (<Image {...props} alt={(data.me.name ?? "")} src={data.me?.image}  onClick={handleProfileImgClick}/>)
-
-    return <div>
-
-
-        <ImageWithProps referrerpolicy='no-referrer' />
-        
-        {profileMenuVisibility &&
+      {profileMenuVisibility && (
         <div>
-            <ProfileMenu onClick={handleProfileImgClick}/>
-            <ProfileMenuBox>
-                <ProfileMenuHeadingText>Your Profile Infos:</ProfileMenuHeadingText>
-                <p>{data.me.name}</p>
-                <p>{data.me.email}</p>
+          <ProfileMenu onClick={handleProfileImgClick} />
+          <ProfileMenuBox>
+            <ProfileMenuHeadingText>Your Profile Infos:</ProfileMenuHeadingText>
+            <p>{data.me.name}</p>
+            <p>{data.me.email}</p>
 
-                <LogOutButtonDiv>
-                    <SignOutButton onClick={() => signOut({redirect: false})}>Signout</SignOutButton>
-                </LogOutButtonDiv>
-
-            </ProfileMenuBox>
+            <LogOutButtonDiv>
+              <SignOutButton onClick={() => signOut({ redirect: false })}>
+                Signout
+              </SignOutButton>
+            </LogOutButtonDiv>
+          </ProfileMenuBox>
         </div>
-        }
-    </div>;
+      )}
+    </div>
+  );
 };
 
 export default MyUserAvatar;
