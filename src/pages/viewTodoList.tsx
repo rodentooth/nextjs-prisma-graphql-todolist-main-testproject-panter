@@ -1,5 +1,4 @@
 import type { NextPage } from "next";
-import { signIn, signOut } from "next-auth/react";
 import React, { useState } from "react";
 import Heading from "../ui/layout/components/Heading";
 import PageLayout from "../ui/layout/components/PageLayout";
